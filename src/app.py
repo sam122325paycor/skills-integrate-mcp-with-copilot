@@ -87,17 +87,27 @@ class LoginRequest(BaseModel):
 
 
 def load_teacher_credentials():
-    credentials_path = current_dir / "teachers.json"
-    if not credentials_path.exists():
-        return {}
+    env_credentials = os.environ.get("ADMIN_CREDENTIALS_JSON", "").strip()
+    if env_credentials:
+        try:
+            parsed_env_credentials = json.loads(env_credentials)
+            if isinstance(parsed_env_credentials, dict) and "teachers" in parsed_env_credentials:
+                return parsed_env_credentials.get("teachers", {})
+            if isinstance(parsed_env_credentials, dict):
+                return parsed_env_credentials
+        except json.JSONDecodeError as exc:
+            raise RuntimeError("ADMIN_CREDENTIALS_JSON must be valid JSON") from exc
 
-    try:
-        with open(credentials_path, "r", encoding="utf-8") as credentials_file:
-            credentials_data = json.load(credentials_file)
-    except json.JSONDecodeError as exc:
-        raise RuntimeError(f"Invalid teachers.json format: {exc}") from exc
+    credentials_path = current_dir / "teachers.local.json"
+    if credentials_path.exists():
+        try:
+            with open(credentials_path, "r", encoding="utf-8") as credentials_file:
+                credentials_data = json.load(credentials_file)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError(f"Invalid teachers.local.json format: {exc}") from exc
+        return credentials_data.get("teachers", {})
 
-    return credentials_data.get("teachers", {})
+    return {}
 
 
 teacher_credentials = load_teacher_credentials()
@@ -128,6 +138,12 @@ def get_activities():
 
 @app.post("/admin/login")
 def admin_login(payload: LoginRequest):
+    if not teacher_credentials:
+        raise HTTPException(
+            status_code=503,
+            detail="Admin login is not configured on this server"
+        )
+
     expected_password = teacher_credentials.get(payload.username)
     if expected_password is None or not secrets.compare_digest(expected_password, payload.password):
         raise HTTPException(status_code=401, detail="Invalid username or password")
