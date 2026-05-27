@@ -16,12 +16,47 @@ body {
 }
 
 header {
-  text-align: center;
+  text-align: left;
   padding: 20px 0;
   margin-bottom: 30px;
   background-color: #1a237e;
   color: white;
   border-radius: 5px;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 0 20px;
+}
+
+.admin-menu-container {
+  position: relative;
+}
+
+.icon-button {
+  font-size: 20px;
+  padding: 8px 12px;
+}
+
+.admin-menu {
+  position: absolute;
+  right: 0;
+  top: 52px;
+  width: 280px;
+  background-color: white;
+  color: #333;
+  border-radius: 6px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+  padding: 14px;
+  z-index: 20;
+}
+
+.admin-status {
+  margin-bottom: 10px;
+  font-weight: bold;
 }
 
 header h1 {
@@ -121,6 +156,11 @@ section h3 {
   border-radius: 3px;
 }
 
+.delete-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .delete-btn:hover {
   background-color: #ffebee;
 }
@@ -164,6 +204,11 @@ button:hover {
   background-color: #3949ab;
 }
 
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .message {
   margin-top: 20px;
   padding: 10px;
@@ -188,6 +233,10 @@ button:hover {
   border: 1px solid #bee5eb;
 }
 
+#admin-required-note {
+  margin-bottom: 12px;
+}
+
 .hidden {
   display: none;
 }
@@ -197,4 +246,16 @@ footer {
   margin-top: 30px;
   padding: 20px;
   color: #666;
+}
+
+@media (max-width: 767px) {
+  .header-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .admin-menu {
+    left: 0;
+    right: auto;
+  }
 }
