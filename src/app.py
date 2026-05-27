@@ -91,8 +91,11 @@ def load_teacher_credentials():
     if not credentials_path.exists():
         return {}
 
-    with open(credentials_path, "r", encoding="utf-8") as credentials_file:
-        credentials_data = json.load(credentials_file)
+    try:
+        with open(credentials_path, "r", encoding="utf-8") as credentials_file:
+            credentials_data = json.load(credentials_file)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError(f"Invalid teachers.json format: {exc}") from exc
 
     return credentials_data.get("teachers", {})
 
