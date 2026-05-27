@@ -129,7 +129,7 @@ def get_activities():
 @app.post("/admin/login")
 def admin_login(payload: LoginRequest):
     expected_password = teacher_credentials.get(payload.username)
-    if expected_password is None or expected_password != payload.password:
+    if expected_password is None or not secrets.compare_digest(expected_password, payload.password):
         raise HTTPException(status_code=401, detail="Invalid username or password")
 
     token = secrets.token_urlsafe(32)
